@@ -23,8 +23,11 @@ class GameScene: SKScene {
             let x : CGFloat = CGFloat(GKRandomSource.sharedRandom().nextInt(upperBound: Int(screen.size.width)))
             let y : CGFloat = CGFloat(GKRandomSource.sharedRandom().nextInt(upperBound: Int(screen.size.height)))
             
-            let isLand = Island.populateIsland(at: CGPoint(x: x, y: y))
+            let isLand = Island.populateSprite(at: CGPoint(x: x, y: y))
             self.addChild(isLand)
+            
+            let cloud = Cloud.populateSprite(at: CGPoint(x: x, y: y))
+            self.addChild(cloud)
         }
     }
 }
