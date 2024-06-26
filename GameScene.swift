@@ -17,7 +17,7 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         
-       configureStartScene()
+        configureStartScene()
         spawnClouds()
         spawnIsland()
     }
@@ -25,7 +25,7 @@ class GameScene: SKScene {
     fileprivate func spawnClouds() {
         let spawnCloudWait = SKAction.wait(forDuration: 1)
         let spawnCloudAction = SKAction.run {
-            let cloud = Cloud.populate()
+            let cloud = Cloud.populate(at: nil)
             self.addChild(cloud)
         }
         
@@ -37,7 +37,7 @@ class GameScene: SKScene {
     fileprivate func spawnIsland() {
         let spawnIslandWait = SKAction.wait(forDuration: 2)
         let spawnIslandAction = SKAction.run {
-            let island = Island.populate()
+            let island = Island.populate(at: nil)
             self.addChild(island)
         }
         
@@ -58,7 +58,7 @@ class GameScene: SKScene {
         self.addChild(isLand1)
         
         let isLand2 = Island.populate(at: CGPoint(x: self.size.width - 100, y: self.size.height - 200))
-       
+        
         self.addChild(isLand2)
         
         player = PlayerPlane.populate(at: CGPoint(x: screen.size.width / 2, y: 100))
@@ -82,6 +82,12 @@ class GameScene: SKScene {
             player.position.x = self.size.width + 70
         } else if player.position.x > self.size.width + 70 {
             player.position.x = -70
+        }
+        
+        enumerateChildNodes(withName: "backgroundSprite") { (node, stop) in
+            if node.position.y < -199 {
+                node.removeFromParent()
+            }
         }
     }
 }
