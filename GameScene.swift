@@ -7,25 +7,29 @@
 
 import SpriteKit
 import GameplayKit
-import CoreMotion
+
 
 class GameScene: SKScene {
     
-    let motionManager = CMMotionManager()
-    var xAcceleration: CGFloat = 0
-    var player: SKSpriteNode!
+    var player: PlayerPlane!
     
     override func didMove(to view: SKView) {
         
-       configureStartScene()
+        configureStartScene()
         spawnClouds()
         spawnIsland()
+        player.performFly()
+        
+        let powerUp = PowerUp()
+        powerUp.performRotation()
+        powerUp.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
+        self.addChild(powerUp)
     }
     
     fileprivate func spawnClouds() {
         let spawnCloudWait = SKAction.wait(forDuration: 1)
         let spawnCloudAction = SKAction.run {
-            let cloud = Cloud.populate()
+            let cloud = Cloud.populate(at: nil)
             self.addChild(cloud)
         }
         
@@ -37,7 +41,7 @@ class GameScene: SKScene {
     fileprivate func spawnIsland() {
         let spawnIslandWait = SKAction.wait(forDuration: 2)
         let spawnIslandAction = SKAction.run {
-            let island = Island.populate()
+            let island = Island.populate(at: nil)
             self.addChild(island)
         }
         
@@ -58,30 +62,22 @@ class GameScene: SKScene {
         self.addChild(isLand1)
         
         let isLand2 = Island.populate(at: CGPoint(x: self.size.width - 100, y: self.size.height - 200))
-       
+        
         self.addChild(isLand2)
         
         player = PlayerPlane.populate(at: CGPoint(x: screen.size.width / 2, y: 100))
         self.addChild(player)
         
-        motionManager.accelerometerUpdateInterval = 0.2
-        motionManager.startAccelerometerUpdates(to: OperationQueue.current!) { (data, error) in
-            if let data = data {
-                let acceleration = data.acceleration
-                self.xAcceleration = CGFloat(acceleration.x) * 0.7 + self.xAcceleration * 0.3
-            }
-        }
+       
     }
     
     override func didSimulatePhysics() {
-        super.didSimulatePhysics()
-        
-        player.position.x += xAcceleration * 50
-        
-        if player.position.x < -70 {
-            player.position.x = self.size.width + 70
-        } else if player.position.x > self.size.width + 70 {
-            player.position.x = -70
+        player.checkPosition()
+    
+        enumerateChildNodes(withName: "backgroundSprite") { (node, stop) in
+            if node.position.y < -199 {
+                node.removeFromParent()
+            }
         }
     }
 }
